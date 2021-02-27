@@ -1,1 +1,1 @@
-# cashier
+# Cashier Apps
