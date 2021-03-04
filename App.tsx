@@ -1,100 +1,64 @@
-import React, { FC } from 'react'
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-} from 'react-native'
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen'
+import React, { FC, useEffect, useState } from 'react'
+import { createStackNavigator } from '@react-navigation/stack'
+import { NavigationContainer } from '@react-navigation/native'
+import Home from './src/screens/Home'
+import DatabaseProvider from '@nozbe/watermelondb/DatabaseProvider'
+import Database from '@nozbe/watermelondb/Database'
+import Product from './src/models/product'
+import { schema } from './src/models/schema'
+import SQLiteAdapter from '@nozbe/watermelondb/adapters/sqlite'
+import { BackHandler, ToastAndroid } from 'react-native'
+
+const Stack = createStackNavigator()
 
 const App: FC = () => {
+  const [exitApp, setExitApp] = useState<number>(0)
+
+  useEffect(() => {
+    const backAction = () => {
+      const timeout = setTimeout(() => {
+        setExitApp(0)
+      }, 1500)
+
+      if (exitApp === 0) {
+        setExitApp(exitApp + 1)
+        ToastAndroid.show('Press again to exit', ToastAndroid.SHORT)
+        clearTimeout(timeout)
+      } else if (exitApp === 1) {
+        BackHandler.exitApp()
+        clearTimeout(timeout)
+      }
+      return true
+    }
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    )
+
+    return () => backHandler.remove()
+  }, [exitApp])
+
+  const adapter = new SQLiteAdapter({
+    dbName: 'cashierDb',
+    schema,
+  })
+
+  const database = new Database({
+    adapter,
+    modelClasses: [Product],
+    actionsEnabled: true,
+  })
+
   return (
-    <>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <Header />
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </>
+    <DatabaseProvider database={database}>
+      <NavigationContainer>
+        <Stack.Navigator headerMode="none">
+          <Stack.Screen name="Home" component={Home} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </DatabaseProvider>
   )
 }
-
-const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
-  },
-  engine: {
-    position: 'absolute',
-    right: 0,
-  },
-  body: {
-    backgroundColor: Colors.white,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
-})
 
 export default App

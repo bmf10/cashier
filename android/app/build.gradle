@@ -1,4 +1,7 @@
 apply plugin: "com.android.application"
+apply plugin: "com.android.application"
+apply plugin: 'kotlin-android'
+apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 
 import com.android.build.OutputFile
 
@@ -207,6 +210,8 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+    implementation project(':watermelondb')
 }
 
 // Run this once to be able to run the application with BUCK

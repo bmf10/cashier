@@ -10,26 +10,30 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@nozbe/watermelondb": "^0.20.0",
+    "@nozbe/with-observables": "^1.0.8",
     "@react-native-community/masked-view": "^0.1.10",
     "@react-navigation/native": "^5.9.3",
     "@react-navigation/stack": "^5.14.3",
     "@types/pouchdb": "^6.4.0",
-    "pouchdb": "^7.2.2",
     "react": "16.13.1",
     "react-native": "0.63.4",
     "react-native-gesture-handler": "^1.10.2",
     "react-native-linear-gradient": "^2.4.4",
     "react-native-reanimated": "^1.7.0",
     "react-native-safe-area-context": "^3.1.9",
-    "react-native-screens": "^2.17.1"
+    "react-native-screens": "^2.17.1",
+    "react-native-vector-icons": "^8.1.0"
   },
   "devDependencies": {
     "@babel/core": "7.13.1",
+    "@babel/plugin-proposal-decorators": "^7.13.5",
     "@babel/runtime": "7.13.4",
     "@react-native-community/eslint-config": "1.1.0",
     "@types/jest": "^26.0.20",
     "@types/react": "^17.0.2",
     "@types/react-native": "^0.63.50",
+    "@types/react-native-vector-icons": "^6.4.6",
     "@types/react-test-renderer": "^17.0.1",
     "babel-jest": "25.5.1",
     "babel-plugin-module-resolver": "^4.1.0",
