@@ -1,15 +1,14 @@
 import React, { FC, useEffect, useState } from 'react'
-import { createStackNavigator } from '@react-navigation/stack'
 import { NavigationContainer } from '@react-navigation/native'
 import Home from './src/screens/Home'
 import DatabaseProvider from '@nozbe/watermelondb/DatabaseProvider'
-import Database from '@nozbe/watermelondb/Database'
-import Product from './src/models/product'
-import { schema } from './src/models/schema'
-import SQLiteAdapter from '@nozbe/watermelondb/adapters/sqlite'
-import { BackHandler, ToastAndroid } from 'react-native'
+import database from './src/models'
+import { BackHandler, StyleSheet, ToastAndroid } from 'react-native'
+import Archive from './src/screens/Archive'
+import { createDrawerNavigator } from '@react-navigation/drawer'
+import DrawerContent from './src/components/Drawer'
 
-const Stack = createStackNavigator()
+const Drawer = createDrawerNavigator()
 
 const App: FC = () => {
   const [exitApp, setExitApp] = useState<number>(0)
@@ -39,26 +38,47 @@ const App: FC = () => {
     return () => backHandler.remove()
   }, [exitApp])
 
-  const adapter = new SQLiteAdapter({
-    dbName: 'cashierDb',
-    schema,
-  })
-
-  const database = new Database({
-    adapter,
-    modelClasses: [Product],
-    actionsEnabled: true,
-  })
-
   return (
     <DatabaseProvider database={database}>
       <NavigationContainer>
-        <Stack.Navigator headerMode="none">
-          <Stack.Screen name="Home" component={Home} />
-        </Stack.Navigator>
+        <Drawer.Navigator
+          drawerContent={(props) => <DrawerContent {...props} />}
+          drawerType="front">
+          <Drawer.Screen
+            options={{
+              title: 'Home',
+              headerShown: true,
+              headerStyle: styles.header,
+            }}
+            name="Home"
+            component={Home}
+          />
+          <Drawer.Screen
+            options={{
+              title: 'Arsip',
+              headerShown: true,
+            }}
+            name="Archive"
+            component={Archive}
+          />
+        </Drawer.Navigator>
       </NavigationContainer>
     </DatabaseProvider>
   )
 }
+
+const styles = StyleSheet.create({
+  header: {
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+
+    elevation: 5,
+  },
+})
 
 export default App

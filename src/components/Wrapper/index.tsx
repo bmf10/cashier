@@ -2,7 +2,7 @@ import React, { FC, useRef } from 'react'
 import { StyleSheet, DrawerLayoutAndroid, Text, View } from 'react-native'
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
 import Icon from 'react-native-vector-icons/FontAwesome'
-
+import { useNavigation } from '@react-navigation/native'
 export interface WrapperProps {
   readonly children: React.ReactNode
   readonly title?: string
@@ -10,17 +10,22 @@ export interface WrapperProps {
 
 const Wrapper: FC<WrapperProps> = ({ children, title }: WrapperProps) => {
   const drawer = useRef<DrawerLayoutAndroid>(null)
+  const navigation = useNavigation()
 
   const navigationView = () => (
     <View style={styles.navigationContainer}>
       <Text style={styles.credit}>Cashier Apps</Text>
-      <TouchableOpacity style={styles.menuActive}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate('home')}
+        style={styles.menuActive}>
         <Icon name="home" size={20} />
         <Text style={styles.menuText}>Home</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.menu}>
-        <Icon name="puzzle-piece" size={20} />
-        <Text style={styles.menuText}>Coming Soon!</Text>
+      <TouchableOpacity
+        onPress={() => navigation.navigate('archive')}
+        style={styles.menu}>
+        <Icon name="archive" size={20} />
+        <Text style={styles.menuText}>Arsip</Text>
       </TouchableOpacity>
       <Text style={styles.copyRight}>2021 Bima Febriansyah</Text>
     </View>

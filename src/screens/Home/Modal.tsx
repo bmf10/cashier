@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react'
+import React, { FC, useEffect, useMemo, useState } from 'react'
 import {
   Modal as RNModal,
   StyleSheet,
@@ -16,12 +16,21 @@ export interface Props {
   readonly visible: boolean
   readonly onClose: () => void
   readonly state: 'edit' | 'new'
+  readonly id?: string
+  readonly onSuccess: () => void
 }
 
-const Modal: FC<Props> = ({ visible, onClose, state }: Props) => {
+const Modal: FC<Props> = ({
+  visible,
+  onClose,
+  state,
+  id,
+  onSuccess,
+}: Props) => {
   const [name, setName] = useState<string>()
   const [price, setPrice] = useState<number>()
   const [loading, setLoading] = useState<boolean>(false)
+  const [loadingDelete, setLoadingDelete] = useState<boolean>(false)
   const [error, setError] = useState<string>()
   const database = useDatabase()
   const productCollection = useMemo(
@@ -34,32 +43,94 @@ const Modal: FC<Props> = ({ visible, onClose, state }: Props) => {
     setPrice(parseInt(newVal, 10))
   }
 
-  const onSubmit = async () => {
+  useEffect(() => {
+    if (state === 'edit' && id) {
+      productCollection.find(id).then((value) => {
+        setName(value.name)
+        setPrice(value.price)
+      })
+    }
+  }, [id, productCollection, state])
+
+  const onSubmit = () => {
     if (name && price) {
       setError(undefined)
       setLoading(true)
       if (state === 'new') {
-        await database.action(async () => {
+        database.action(async () => {
           try {
-            await productCollection.create((post) => {
-              post.name = name
-              post.price = price
+            await productCollection.create((entity) => {
+              entity.name = name
+              entity.price = price
+              entity.isArchive = false
             })
             setLoading(false)
-            onClose()
+            onSuccess()
+            onRequestClose()
           } catch (e) {
             setLoading(false)
             setError(e)
           }
         })
+      } else if (state === 'edit' && id) {
+        database.action(async () => {
+          try {
+            const product = await productCollection.find(id)
+            await product.update((entity) => {
+              entity.name = name
+              entity.price = price
+              entity.isArchive = false
+            })
+            setLoading(false)
+            onSuccess()
+            onRequestClose()
+          } catch (e) {
+            setLoading(false)
+            setError(e)
+          }
+        })
+      } else {
+        onRequestClose()
       }
     } else {
       setError('Data belum lengkap')
     }
   }
 
+  const onDelete = () => {
+    setError(undefined)
+    setLoadingDelete(true)
+    if (state === 'edit' && id) {
+      database.action(async () => {
+        try {
+          const product = await productCollection.find(id)
+          await product.update((entity) => {
+            entity.isArchive = true
+          })
+          setLoadingDelete(false)
+          onSuccess()
+          onRequestClose()
+        } catch (e) {
+          setLoadingDelete(false)
+          setError(e)
+        }
+      })
+    }
+  }
+
+  const onRequestClose = () => {
+    setName(undefined)
+    setPrice(undefined)
+    setError(undefined)
+    setLoading(false)
+    onClose()
+  }
+
   return (
-    <RNModal visible={visible} onRequestClose={onClose} animationType="slide">
+    <RNModal
+      visible={visible}
+      onRequestClose={onRequestClose}
+      animationType="slide">
       <View style={styles.modal}>
         <TouchableOpacity style={styles.closeButton} onPress={onClose}>
           <Icon name="times" size={25} />
@@ -77,7 +148,7 @@ const Modal: FC<Props> = ({ visible, onClose, state }: Props) => {
           />
           <TextInput
             onChangeText={changePrice}
-            value={price?.toString()}
+            value={price ? price.toString() : undefined}
             editable={!loading}
             keyboardType="number-pad"
             placeholder="Harga..."
@@ -95,8 +166,15 @@ const Modal: FC<Props> = ({ visible, onClose, state }: Props) => {
               )}
             </TouchableOpacity>
             {state === 'edit' ? (
-              <TouchableOpacity style={styles.buttonDelete}>
-                <Text>Hapus</Text>
+              <TouchableOpacity
+                disabled={loading}
+                onPress={onDelete}
+                style={styles.buttonDelete}>
+                {loadingDelete ? (
+                  <ActivityIndicator size="small" color="#000" />
+                ) : (
+                  <Text>Arsipkan</Text>
+                )}
               </TouchableOpacity>
             ) : undefined}
           </View>
@@ -119,6 +197,21 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 20,
     right: 20,
+    height: 40,
+    width: 40,
+    backgroundColor: '#fff',
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+
+    elevation: 5,
   },
   title: {
     fontSize: 25,
@@ -132,12 +225,20 @@ const styles = StyleSheet.create({
   input: {
     height: 40,
     width: '70%',
-    borderWidth: 1,
-    borderColor: '#000',
+    backgroundColor: '#fff',
     borderRadius: 5,
     marginBottom: 20,
     textAlign: 'center',
     fontSize: 18,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+
+    elevation: 5,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -150,6 +251,15 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     borderRadius: 5,
     marginRight: 5,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+
+    elevation: 5,
   },
   buttonDelete: {
     backgroundColor: '#f95a37',
@@ -159,6 +269,15 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     borderRadius: 5,
     marginLeft: 5,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+
+    elevation: 5,
   },
   error: {
     color: '#f95a37',

@@ -11,6 +11,7 @@ module.exports = {
           screens: './src/screens',
           utils: './src/utils',
           models: './src/models',
+          hooks: './src/hooks',
         },
       },
     ],

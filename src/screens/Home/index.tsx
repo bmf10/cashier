@@ -1,5 +1,4 @@
-import Wrapper from 'components/Wrapper'
-import React, { FC, useMemo, useState } from 'react'
+import React, { FC, Fragment, useEffect, useState } from 'react'
 import {
   StyleSheet,
   Text,
@@ -12,45 +11,80 @@ import Modal from './Modal'
 import { useDatabase } from '@nozbe/watermelondb/hooks'
 import type Product from 'models/product'
 import type { ProductEntity } from 'models/product'
+import { where } from '@nozbe/watermelondb/QueryDescription'
+import Counting, { Item } from './Counting'
 
 const Home: FC = () => {
   const [openEdit, setOpenEdit] = useState<boolean>(false)
   const [openNew, setOpenNew] = useState<boolean>(false)
+  const [editId, setEditId] = useState<string>()
   const [data, setData] = useState<ReadonlyArray<ProductEntity>>([])
   const [loading, setLoading] = useState<boolean>(true)
+  const [items, setItems] = useState<ReadonlyArray<Item>>([])
   const database = useDatabase()
-  const productCollection = useMemo(
-    () => database.collections.get<Product>('products'),
-    [database.collections],
-  )
+  const productCollection = database.collections.get<Product>('products')
 
-  useMemo(async () => {
+  useEffect(() => {
     if (data.length === 0) {
       setLoading(true)
-      await database.action(async () => {
-        try {
-          const value = await productCollection.query().fetch()
-          setData(value)
-          setLoading(false)
-        } catch (error) {
-          setLoading(false)
-        }
-      })
+      database.action(() =>
+        productCollection
+          .query(where('isArchive', false))
+          .fetch()
+          .then((value) => {
+            setData(value)
+            setLoading(false)
+          })
+          .catch(() => setLoading(false)),
+      )
     }
   }, [data.length, database, productCollection])
 
+  const onSuccess = () => {
+    setEditId(undefined)
+    setLoading(true)
+    database.action(() =>
+      productCollection
+        .query(where('isArchive', false))
+        .fetch()
+        .then((value) => {
+          setData(value)
+          setLoading(false)
+        })
+        .catch(() => setLoading(false)),
+    )
+  }
+
+  const handleEdit = (id: string) => {
+    setEditId(id)
+    setOpenEdit(true)
+  }
+
+  const handleAdd = (id: string, name: string, price: number) => {
+    const index = items.findIndex((i) => i.id === id)
+    if (index < 0) {
+      setItems([...items, { id, name, price, amount: 1 }])
+    } else {
+      const item = items.map((x, i) =>
+        i === index ? { ...x, amount: x.amount + 1 } : x,
+      )
+      setItems(item)
+    }
+  }
+
   return (
-    <Wrapper title="Menu">
+    <Fragment>
       <View style={styles.container}>
         {loading ? (
           <View style={styles.loading}>
             <ActivityIndicator color="#a7bf2e" size="large" />
           </View>
         ) : data ? (
-          data.map(({ name, price }, index) => (
+          data.map(({ name, price, id }, index) => (
             <View style={styles.box} key={index}>
               <TouchableOpacity
-                onLongPress={() => setOpenEdit(true)}
+                onPress={() => handleAdd(id, name, price)}
+                onLongPress={() => handleEdit(id)}
                 style={styles.innerBox}>
                 <Text style={styles.name}>{name}</Text>
                 <Text style={styles.price}>{price}</Text>
@@ -67,23 +101,35 @@ const Home: FC = () => {
             </TouchableOpacity>
           </View>
         ) : undefined}
+
+        <Counting items={items} />
       </View>
       <Modal
+        onSuccess={onSuccess}
+        id={editId}
         state="edit"
         onClose={() => setOpenEdit(false)}
         visible={openEdit}
       />
-      <Modal state="new" onClose={() => setOpenNew(false)} visible={openNew} />
-    </Wrapper>
+      <Modal
+        onSuccess={onSuccess}
+        state="new"
+        onClose={() => setOpenNew(false)}
+        visible={openNew}
+      />
+    </Fragment>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
+    position: 'relative',
     display: 'flex',
     flexWrap: 'wrap',
     flexDirection: 'row',
     justifyContent: 'flex-start',
+    height: '100%',
+    width: '100%',
   },
   box: {
     width: '33.3333333%',
@@ -91,9 +137,8 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   innerBox: {
-    borderRadius: 5,
-    borderColor: '#BDBDBD',
-    borderWidth: 1,
+    borderRadius: 10,
+    backgroundColor: '#fff',
     height: '100%',
     width: '100%',
     display: 'flex',
@@ -101,14 +146,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     alignContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+
+    elevation: 5,
   },
   name: {
     fontWeight: 'bold',
     fontSize: 20,
+    textAlign: 'center',
   },
   price: {
     fontWeight: 'bold',
+    marginTop: 5,
     fontSize: 18,
+    textAlign: 'center',
+    color: '#f95a37',
   },
   modal: {
     height: '100%',
