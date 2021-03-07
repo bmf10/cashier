@@ -13,7 +13,7 @@ export const adapter = new SQLiteAdapter({
 export const database = new Database({
   adapter,
   modelClasses: models,
-  actionsEnabled: true,
+  actionsEnabled: false,
 })
 
 export default database

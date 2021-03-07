@@ -132,7 +132,10 @@ const Modal: FC<Props> = ({
       onRequestClose={onRequestClose}
       animationType="slide">
       <View style={styles.modal}>
-        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={styles.closeButton}
+          onPress={onClose}>
           <Icon name="times" size={25} />
         </TouchableOpacity>
         <Text style={styles.title}>
@@ -156,6 +159,7 @@ const Modal: FC<Props> = ({
           />
           <View style={styles.buttonContainer}>
             <TouchableOpacity
+              activeOpacity={0.8}
               onPress={onSubmit}
               disabled={loading}
               style={styles.buttonSave}>
@@ -167,6 +171,7 @@ const Modal: FC<Props> = ({
             </TouchableOpacity>
             {state === 'edit' ? (
               <TouchableOpacity
+                activeOpacity={0.8}
                 disabled={loading}
                 onPress={onDelete}
                 style={styles.buttonDelete}>
@@ -191,7 +196,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
-    paddingTop: 20,
+    paddingTop: 30,
   },
   closeButton: {
     position: 'absolute',
@@ -214,7 +219,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   title: {
-    fontSize: 25,
+    fontSize: 20,
   },
   form: {
     flex: 1,
@@ -229,7 +234,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 20,
     textAlign: 'center',
-    fontSize: 18,
+    fontSize: 14,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

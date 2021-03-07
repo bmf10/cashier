@@ -1,7 +1,6 @@
 import type { DrawerContentComponentProps } from '@react-navigation/drawer'
 import React, { FC } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
-import { TouchableOpacity } from 'react-native-gesture-handler'
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome'
 
 const Drawer: FC<DrawerContentComponentProps> = (
@@ -13,23 +12,25 @@ const Drawer: FC<DrawerContentComponentProps> = (
     <View style={styles.navigationContainer}>
       <Text style={styles.credit}>Simple Cashier</Text>
       <TouchableOpacity
+        activeOpacity={0.9}
         onPress={() => navigation.navigate('Home')}
         style={
           state.index === state.routeNames.findIndex((a) => a === 'Home')
             ? styles.menuActive
             : styles.menu
         }>
-        <Icon name="home" size={20} />
+        <Icon name="home" size={16} />
         <Text style={styles.menuText}>Home</Text>
       </TouchableOpacity>
       <TouchableOpacity
+        activeOpacity={0.9}
         onPress={() => navigation.navigate('Archive')}
         style={
           state.index === state.routeNames.findIndex((a) => a === 'Archive')
             ? styles.menuActive
             : styles.menu
         }>
-        <Icon name="archive" size={20} />
+        <Icon name="archive" size={16} />
         <Text style={styles.menuText}>Arsip</Text>
       </TouchableOpacity>
       <Text style={styles.copyRight}>2021 Bima Febriansyah</Text>
@@ -44,14 +45,17 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   credit: {
-    fontSize: 28,
+    fontSize: 24,
     marginBottom: 50,
     marginLeft: 10,
   },
   menuActive: {
     width: '100%',
     backgroundColor: '#a7bf2e',
-    padding: 10,
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingTop: 18,
+    paddingBottom: 18,
     marginBottom: 10,
     borderRadius: 5,
     display: 'flex',
@@ -77,7 +81,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   menuText: {
-    fontSize: 20,
+    fontSize: 14,
     marginLeft: 10,
   },
   copyRight: {

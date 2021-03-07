@@ -7,6 +7,7 @@ import { BackHandler, StyleSheet, ToastAndroid } from 'react-native'
 import Archive from './src/screens/Archive'
 import { createDrawerNavigator } from '@react-navigation/drawer'
 import DrawerContent from './src/components/Drawer'
+import Header from './src/components/Header'
 
 const Drawer = createDrawerNavigator()
 
@@ -15,17 +16,15 @@ const App: FC = () => {
 
   useEffect(() => {
     const backAction = () => {
-      const timeout = setTimeout(() => {
+      setTimeout(() => {
         setExitApp(0)
       }, 1500)
 
       if (exitApp === 0) {
         setExitApp(exitApp + 1)
         ToastAndroid.show('Press again to exit', ToastAndroid.SHORT)
-        clearTimeout(timeout)
       } else if (exitApp === 1) {
         BackHandler.exitApp()
-        clearTimeout(timeout)
       }
       return true
     }
@@ -42,25 +41,16 @@ const App: FC = () => {
     <DatabaseProvider database={database}>
       <NavigationContainer>
         <Drawer.Navigator
+          drawerType="back"
           drawerContent={(props) => <DrawerContent {...props} />}
-          drawerType="front">
-          <Drawer.Screen
-            options={{
-              title: 'Home',
-              headerShown: true,
-              headerStyle: styles.header,
-            }}
-            name="Home"
-            component={Home}
-          />
-          <Drawer.Screen
-            options={{
-              title: 'Arsip',
-              headerShown: true,
-            }}
-            name="Archive"
-            component={Archive}
-          />
+          lazy={true}
+          screenOptions={{
+            headerShown: true,
+            headerStyle: styles.header,
+            header: (props) => <Header {...props} />,
+          }}>
+          <Drawer.Screen name="Home" component={Home} />
+          <Drawer.Screen name="Archive" component={Archive} />
         </Drawer.Navigator>
       </NavigationContainer>
     </DatabaseProvider>
@@ -69,6 +59,9 @@ const App: FC = () => {
 
 const styles = StyleSheet.create({
   header: {
+    height: 55,
+    margin: 10,
+    borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
