@@ -1,8 +1,9 @@
 # Cashier Apps
-"Cashier" is a tool/utility apps created using JavaScript, SQLite(WatermelonDB), and the React-Native framework. <br><br> Download on the release page <br> https://github.com/bmf10/cashier/releases
+"Cashier" is a tool/utility apps created using Typescript, SQLite(WatermelonDB), and the React-Native framework. <br><br> Download on the release page <br> https://github.com/bmf10/cashier/releases
 
 ## Features
 * **App Feature**
+    * Regular cash register 
     * Simplicity
     * 100% offline
     * No authentication
