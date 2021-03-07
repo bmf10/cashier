@@ -87,10 +87,21 @@ const Counting: FC<Props> = ({ items, onFinish }: Props) => {
                   ))
                 : undefined}
               <View style={styles.payment}>
+                <Text style={styles.label}>Total</Text>
+                <TextInput
+                  editable={false}
+                  onChangeText={setStatePayment}
+                  value={total.toString()}
+                  style={styles.input}
+                  placeholder="0"
+                  keyboardType="numeric"
+                />
+              </View>
+              <View style={styles.payment}>
                 <Text style={styles.label}>Uang Bayar</Text>
                 <TextInput
                   onChangeText={setStatePayment}
-                  value={payment?.toString()}
+                  value={payment ? payment.toString() : undefined}
                   style={styles.input}
                   placeholder="0"
                   keyboardType="numeric"
