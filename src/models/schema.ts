@@ -11,6 +11,21 @@ export const schema = appSchema({
         { name: 'isArchive', type: 'boolean' },
         { name: 'created_at', type: 'number' },
         { name: 'updated_at', type: 'number' },
+        {
+          name: 'category_id',
+          type: 'string',
+          isIndexed: true,
+          isOptional: true,
+        },
+      ],
+    }),
+    tableSchema({
+      name: 'categories',
+      columns: [
+        { name: 'name', type: 'string' },
+        { name: 'color', type: 'string' },
+        { name: 'created_at', type: 'number' },
+        { name: 'updated_at', type: 'number' },
       ],
     }),
   ],
