@@ -6,7 +6,7 @@ import {
 export default schemaMigrations({
   migrations: [
     {
-      toVersion: 1,
+      toVersion: 2,
       steps: [
         createTable({
           name: 'products',
