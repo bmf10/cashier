@@ -16,6 +16,8 @@ import type Product from 'models/product'
 import type { ProductEntity } from 'models/product'
 import { where } from '@nozbe/watermelondb/QueryDescription'
 import Counting, { Item } from './Counting'
+import Box from 'components/Box'
+import Container from 'components/Container'
 
 const Home: FC = () => {
   const [openEdit, setOpenEdit] = useState<boolean>(false)
@@ -109,63 +111,51 @@ const Home: FC = () => {
     <Fragment>
       <SafeAreaView>
         <ScrollView>
-          <View style={styles.container}>
+          <Container>
             {loading ? (
               <View style={styles.loading}>
                 <ActivityIndicator color="#a7bf2e" size="large" />
               </View>
             ) : data ? (
               data.map(({ name, price, id }, index) => (
-                <View style={styles.box} key={index}>
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    onPress={() => handleAdd(id, name, price)}
-                    onLongPress={() => handleEdit(id)}
-                    style={styles.innerBox}>
-                    <Text style={styles.name}>{name}</Text>
-                    <Text style={styles.price}>{price}</Text>
-                    {items.find((i) => i.id === id) ? (
-                      <View style={styles.operator}>
-                        <TouchableOpacity
-                          activeOpacity={0.5}
-                          onPress={() =>
-                            handleOperator('minus', id, name, price)
-                          }
-                          style={styles.minus}>
-                          <Text>-</Text>
-                        </TouchableOpacity>
-                        <TextInput
-                          editable={false}
-                          style={styles.input}
-                          value={items
-                            .find((i) => i.id === id)
-                            ?.amount.toString()}
-                        />
-                        <TouchableOpacity
-                          activeOpacity={0.5}
-                          onPress={() =>
-                            handleOperator('plus', id, name, price)
-                          }
-                          style={styles.plus}>
-                          <Text>+</Text>
-                        </TouchableOpacity>
-                      </View>
-                    ) : undefined}
-                  </TouchableOpacity>
-                </View>
+                <Box
+                  key={index}
+                  onPress={() => handleAdd(id, name, price)}
+                  onLongPress={() => handleEdit(id)}>
+                  <Text style={styles.name}>{name}</Text>
+                  <Text style={styles.price}>{price}</Text>
+                  {items.find((i) => i.id === id) ? (
+                    <View style={styles.operator}>
+                      <TouchableOpacity
+                        activeOpacity={0.5}
+                        onPress={() => handleOperator('minus', id, name, price)}
+                        style={styles.minus}>
+                        <Text>-</Text>
+                      </TouchableOpacity>
+                      <TextInput
+                        editable={false}
+                        style={styles.input}
+                        value={items
+                          .find((i) => i.id === id)
+                          ?.amount.toString()}
+                      />
+                      <TouchableOpacity
+                        activeOpacity={0.5}
+                        onPress={() => handleOperator('plus', id, name, price)}
+                        style={styles.plus}>
+                        <Text>+</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : undefined}
+                </Box>
               ))
             ) : undefined}
             {!loading ? (
-              <View style={styles.box}>
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  onPress={() => setOpenNew(true)}
-                  style={styles.innerBox}>
-                  <Icon name="plus" size={25} />
-                </TouchableOpacity>
-              </View>
+              <Box onPress={() => setOpenNew(true)}>
+                <Icon name="plus" size={25} />
+              </Box>
             ) : undefined}
-          </View>
+          </Container>
         </ScrollView>
         <Modal
           onSuccess={onSuccess}

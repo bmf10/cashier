@@ -1,10 +1,12 @@
 import React, { FC, useEffect, useMemo, useState } from 'react'
-import { StyleSheet, View, Text } from 'react-native'
+import { StyleSheet, View, Text, TouchableOpacity, Linking } from 'react-native'
 import { useDatabase } from '@nozbe/watermelondb/hooks'
-import type Product from 'models/product'
 import CModal from 'components/Modal'
 import TextInput from 'components/TextInput'
 import Button from 'components/Button'
+import type Category from 'models/category'
+import { data } from './color'
+import Picker from 'components/Picker'
 
 export interface Props {
   readonly visible: boolean
@@ -15,47 +17,41 @@ export interface Props {
 }
 
 const Modal: FC<Props> = ({
-  visible,
   onClose,
-  state,
-  id,
   onSuccess,
+  state,
+  visible,
+  id,
 }: Props) => {
   const [name, setName] = useState<string>()
-  const [price, setPrice] = useState<number>()
+  const [color, setColor] = useState<string>()
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string>()
   const database = useDatabase()
-  const productCollection = useMemo(
-    () => database.collections.get<Product>('products'),
+  const categoryCollection = useMemo(
+    () => database.collections.get<Category>('categories'),
     [database.collections],
   )
 
-  const changePrice = (v: string) => {
-    const newVal = v.replace(/[^0-9]+/g, '')
-    setPrice(parseInt(newVal, 10))
-  }
-
   useEffect(() => {
     if (state === 'edit' && id) {
-      productCollection.find(id).then((value) => {
+      categoryCollection.find(id).then((value) => {
         setName(value.name)
-        setPrice(value.price)
+        setColor(value.color)
       })
     }
-  }, [id, productCollection, state])
+  }, [id, categoryCollection, state])
 
   const onSubmit = () => {
-    if (name && price) {
+    if (name && color) {
       setError(undefined)
       setLoading(true)
       if (state === 'new') {
         database.action(async () => {
           try {
-            await productCollection.create((entity) => {
+            await categoryCollection.create((entity) => {
               entity.name = name
-              entity.price = price
-              entity.isArchive = false
+              entity.color = color
             })
             setLoading(false)
             onSuccess()
@@ -68,11 +64,10 @@ const Modal: FC<Props> = ({
       } else if (state === 'edit' && id) {
         database.action(async () => {
           try {
-            const product = await productCollection.find(id)
-            await product.update((entity) => {
+            const colors = await categoryCollection.find(id)
+            await colors.update((entity) => {
               entity.name = name
-              entity.price = price
-              entity.isArchive = false
+              entity.color = color
             })
             setLoading(false)
             onSuccess()
@@ -96,10 +91,8 @@ const Modal: FC<Props> = ({
     if (state === 'edit' && id) {
       database.action(async () => {
         try {
-          const product = await productCollection.find(id)
-          await product.update((entity) => {
-            entity.isArchive = true
-          })
+          const colors = await categoryCollection.find(id)
+          await colors.destroyPermanently()
           setLoading(false)
           onSuccess()
           onRequestClose()
@@ -113,7 +106,7 @@ const Modal: FC<Props> = ({
 
   const onRequestClose = () => {
     setName(undefined)
-    setPrice(undefined)
+    setColor('')
     setError(undefined)
     setLoading(false)
     onClose()
@@ -122,7 +115,7 @@ const Modal: FC<Props> = ({
   return (
     <CModal visible={visible} onRequestClose={onRequestClose}>
       <Text style={styles.title}>
-        {state === 'edit' ? 'Edit Produk' : 'Tambah Produk'}
+        {state === 'edit' ? 'Edit Kategori' : 'Tambah Kategori'}
       </Text>
       <View style={styles.form}>
         <TextInput
@@ -132,14 +125,21 @@ const Modal: FC<Props> = ({
           editable={!loading}
           style={styles.input}
         />
-        <TextInput
-          onChangeText={changePrice}
-          value={price ? price.toString() : undefined}
-          editable={!loading}
-          keyboardType="number-pad"
-          placeholder="Harga..."
-          style={styles.input}
+        <Picker
+          placeholder="Select Color"
+          value={color}
+          containerStyle={{ backgroundColor: color || '#fff' }}
+          onSelect={(v) => setColor(v as string)}
+          items={data}
         />
+        <TouchableOpacity
+          onPress={() =>
+            Linking.openURL(
+              'https://reactnative.dev/docs/next/colors#named-colors',
+            )
+          }>
+          <Text style={styles.link}>List Color</Text>
+        </TouchableOpacity>
         <View style={styles.buttonContainer}>
           <Button
             onPress={onSubmit}
@@ -154,7 +154,7 @@ const Modal: FC<Props> = ({
               onPress={onDelete}
               isLoading={loading}
               style={styles.buttonDelete}
-              text="Arsipkan"
+              text="Hapus"
             />
           ) : undefined}
         </View>
@@ -224,6 +224,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   buttonSave: {
+    zIndex: 0,
     backgroundColor: '#a7bf2e',
     paddingLeft: 30,
     paddingRight: 30,
@@ -242,6 +243,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   buttonDelete: {
+    zIndex: 0,
     backgroundColor: '#f95a37',
     paddingLeft: 30,
     paddingRight: 30,
@@ -262,6 +264,11 @@ const styles = StyleSheet.create({
   error: {
     color: '#f95a37',
     marginTop: 20,
+  },
+  link: {
+    color: 'blue',
+    textDecorationLine: 'underline',
+    marginBottom: 20,
   },
 })
 

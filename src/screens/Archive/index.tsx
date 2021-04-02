@@ -1,3 +1,4 @@
+import Container from 'components/Container'
 import React, { FC } from 'react'
 import {
   Dimensions,
@@ -5,16 +6,15 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  View,
 } from 'react-native'
 
 const Archive: FC = () => {
   return (
     <SafeAreaView>
       <ScrollView>
-        <View style={styles.container}>
+        <Container style={styles.container}>
           <Text>it's will update soon</Text>
-        </View>
+        </Container>
       </ScrollView>
     </SafeAreaView>
   )

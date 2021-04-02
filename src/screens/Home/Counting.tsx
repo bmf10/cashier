@@ -1,7 +1,6 @@
 import React, { FC, Fragment, useEffect, useMemo, useState } from 'react'
 import {
   Dimensions,
-  Modal,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -11,6 +10,7 @@ import {
   View,
 } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome'
+import Modal from 'components/Modal'
 
 export interface Item {
   readonly id: string
@@ -67,14 +67,13 @@ const Counting: FC<Props> = ({ items, onFinish }: Props) => {
         </View>
       ) : undefined}
       <Modal
-        animationType="slide"
         collapsable={true}
         visible={visible}
         onRequestClose={() => setVisible(false)}>
         <SafeAreaView>
           <ScrollView>
+            <Text style={styles.modalTitle}>Detail item</Text>
             <View style={styles.modalContainer}>
-              <Text style={styles.modalTitle}>Detail item</Text>
               {items.length > 0
                 ? items.map(({ amount, name, price }, index) => (
                     <View key={index} style={styles.itemContainer}>
@@ -120,12 +119,6 @@ const Counting: FC<Props> = ({ items, onFinish }: Props) => {
             </View>
           </ScrollView>
         </SafeAreaView>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={styles.closeButton}
-          onPress={() => setVisible(false)}>
-          <Icon name="times" size={25} />
-        </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
             onFinish()
@@ -186,11 +179,12 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     paddingRight: 10,
     paddingBottom: 180,
+    flex: 1,
+    width: '100%',
   },
   modalTitle: {
     fontSize: 20,
     textAlign: 'center',
-    marginBottom: 50,
   },
   closeButton: {
     zIndex: 10,
