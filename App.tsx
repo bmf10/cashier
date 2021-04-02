@@ -8,6 +8,7 @@ import Archive from './src/screens/Archive'
 import { createDrawerNavigator } from '@react-navigation/drawer'
 import DrawerContent from './src/components/Drawer'
 import Header from './src/components/Header'
+import Category from './src/screens/Category'
 
 const Drawer = createDrawerNavigator()
 
@@ -51,6 +52,7 @@ const App: FC = () => {
           }}>
           <Drawer.Screen name="Home" component={Home} />
           <Drawer.Screen name="Archive" component={Archive} />
+          <Drawer.Screen name="Category" component={Category} />
         </Drawer.Navigator>
       </NavigationContainer>
     </DatabaseProvider>
