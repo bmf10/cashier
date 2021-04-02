@@ -4,6 +4,19 @@ import React, { FC } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome'
 
+const getLabel = (name: string): string => {
+  switch (name) {
+    case 'Home':
+      return 'Beranda'
+    case 'Archive':
+      return 'Arsip'
+    case 'Category':
+      return 'Kategori'
+    default:
+      return ''
+  }
+}
+
 const Header: FC<DrawerHeaderProps> = ({ scene }: DrawerHeaderProps) => {
   const { route, descriptor } = scene
   return (
@@ -14,7 +27,7 @@ const Header: FC<DrawerHeaderProps> = ({ scene }: DrawerHeaderProps) => {
         }>
         <Icon name="bars" size={18} />
       </TouchableOpacity>
-      <Text style={styles.title}>{route.name}</Text>
+      <Text style={styles.title}>{getLabel(route.name)}</Text>
     </View>
   )
 }

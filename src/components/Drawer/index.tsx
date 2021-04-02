@@ -33,6 +33,17 @@ const Drawer: FC<DrawerContentComponentProps> = (
         <Icon name="archive" size={16} />
         <Text style={styles.menuText}>Arsip</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={() => navigation.navigate('Category')}
+        style={
+          state.index === state.routeNames.findIndex((a) => a === 'Category')
+            ? styles.menuActive
+            : styles.menu
+        }>
+        <Icon name="th" size={16} />
+        <Text style={styles.menuText}>Kategori</Text>
+      </TouchableOpacity>
       <Text style={styles.copyRight}>2021 Bima Febriansyah</Text>
     </View>
   )
@@ -56,7 +67,7 @@ const styles = StyleSheet.create({
     paddingRight: 10,
     paddingTop: 18,
     paddingBottom: 18,
-    marginBottom: 10,
+    marginBottom: 0,
     borderRadius: 5,
     display: 'flex',
     flexDirection: 'row',
@@ -73,8 +84,11 @@ const styles = StyleSheet.create({
   },
   menu: {
     width: '100%',
-    padding: 10,
-    marginBottom: 10,
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingTop: 18,
+    paddingBottom: 18,
+    marginBottom: 0,
     borderRadius: 5,
     display: 'flex',
     flexDirection: 'row',
